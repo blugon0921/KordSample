@@ -18,14 +18,10 @@ class HelloCmd: Command, Runnable {
     override val command = "hello"
     override val description = "Hello, world!"
     override val options = listOf(
-        StringOption("option", "Option").apply {
+        StringOption("location", "이동할 위치를 적어주세요(00:00:00)").apply {
             this.required = true
         }
     )
-
-    override suspend fun deploy(bot: Kord) {
-        super.deploy(bot)
-    }
 
      override fun run() {
         kordLogger.log("${LogColor.CYAN.inColor("✔")} ${LogColor.CYAN.inColor(command)} 커맨드 불러오기 성공")

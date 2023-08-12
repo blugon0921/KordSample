@@ -29,14 +29,8 @@ suspend fun main(args: Array<String>) {
     val rootPackage = Main.javaClass.`package`
 
     //Commands
-    rootPackage.classes("commands").forEach { clazz ->
-        try {
-            val instance = clazz.getDeclaredConstructor().newInstance()
-            (instance as Command).deploy(bot)
-            (instance as Runnable).run()
-        } catch (e: Exception) {
-            return@forEach
-        }
+    rootPackage.classesRunnable("commands").forEach { runnable ->
+        runnable.run()
     }
 
     //Events

@@ -12,115 +12,113 @@ interface Command: Loadable {
     val options: List<Any>?
 
     suspend fun deploy(bot: Kord) {
-        bot.createGuildApplicationCommands(Snowflake(Settings.GUILD_ID)) {
+        bot.createGuildChatInputCommand(Snowflake(Settings.GUILD_ID), command, description) {
             this.setOptions()
         }
-        bot.createGlobalApplicationCommands {
+        bot.createGlobalChatInputCommand(command, description) {
             this.setOptions()
         }
     }
 
-    private fun MultiApplicationCommandBuilder.setOptions() {
-        this.input(command, description) {
-            this@Command.options?.forEach { option ->
-                option as CommandOption
+    private fun ChatInputCreateBuilder.setOptions() {
+        this@Command.options?.forEach { option ->
+            option as CommandOption
 
-                //Mentionable
-                if(option.type == OptionType.MENTIONABLE) {
-                    this.mentionable(option.name, option.description) { option as MentionableOption
-                        this.required = option.required
+            //Mentionable
+            if(option.type == OptionType.MENTIONABLE) {
+                this.mentionable(option.name, option.description) { option as MentionableOption
+                    this.required = option.required
+                }
+            }
+
+            //Channel
+            if(option.type == OptionType.CHANNEL) {
+                this.channel(option.name, option.description) { option as ChannelOption
+                    this.required = option.required
+                    this.channelTypes = option.channelTypes
+                }
+            }
+
+            //User
+            if(option.type == OptionType.USER) {
+                this.user(option.name, option.description) { option as UserOption
+                    this.required = option.required
+                }
+            }
+
+            //Role
+            if(option.type == OptionType.ROLE) {
+                this.user(option.name, option.description) { option as RoleOption
+                    this.required = option.required
+                }
+            }
+
+            //Attachment
+            if(option.type == OptionType.ATTACHMENT) {
+                this.attachment(option.name, option.description) { option as AttachmentOption
+                    this.required = option.required
+                }
+            }
+
+            //Number
+            if(option.type == OptionType.NUMBER) {
+                this.number(option.name, option.description) { option as NumberOption
+                    this.required = option.required
+                    this.minValue = option.minValue
+                    this.maxValue = option.maxValue
+                }
+            }
+
+            //String
+            if(option.type == OptionType.STRING) {
+                this.string(option.name, option.description) { option as StringOption
+                    this.required = option.required
+                    this.minLength = option.minLength
+                    this.maxLength = option.maxLength
+                    option.choices.forEach {
+                        this.choice(it.name, it.value)
                     }
                 }
+            }
 
-                //Channel
-                if(option.type == OptionType.CHANNEL) {
-                    this.channel(option.name, option.description) { option as ChannelOption
-                        this.required = option.required
-                        this.channelTypes = option.channelTypes
+            //Integer
+            if(option.type == OptionType.INTEGER) {
+                this.integer(option.name, option.description) { option as IntegerOption
+                    this.required = option.required
+                    this.minValue = option.minValue
+                    this.maxValue = option.maxValue
+                    option.choices.forEach {
+                        this.choice(it.name, it.value)
                     }
                 }
+            }
 
-                //User
-                if(option.type == OptionType.USER) {
-                    this.user(option.name, option.description) { option as UserOption
-                        this.required = option.required
+            //Boolean
+            if(option.type == OptionType.BOOLEAN) {
+                this.boolean(option.name, option.description) { option as BooleanOption
+                    this.required = option.required
+                }
+            }
+
+            //SubCommand
+            if(option.type == OptionType.SUB_COMMAND) {
+                this.subCommand(option.name, option.description) { option as SubCommandOption
+                    this.required = option.required
+                    option.options?.forEach { option2 ->
+                        this.setOptions(option2)
                     }
                 }
+            }
 
-                //Role
-                if(option.type == OptionType.ROLE) {
-                    this.user(option.name, option.description) { option as RoleOption
-                        this.required = option.required
-                    }
-                }
-
-                //Attachment
-                if(option.type == OptionType.ATTACHMENT) {
-                    this.attachment(option.name, option.description) { option as AttachmentOption
-                        this.required = option.required
-                    }
-                }
-
-                //Number
-                if(option.type == OptionType.INTEGER) {
-                    this.number(option.name, option.description) { option as NumberOption
-                        this.required = option.required
-                        this.minValue = option.minValue
-                        this.maxValue = option.maxValue
-                    }
-                }
-
-                //String
-                if(option.type == OptionType.STRING) {
-                    this.string(option.name, option.description) { option as StringOption
-                        this.required = option.required
-                        this.minLength = option.minLength
-                        this.maxLength = option.maxLength
-                        option.choices.forEach {
-                            this.choice(it.name, it.value)
-                        }
-                    }
-                }
-
-                //Integer
-                if(option.type == OptionType.INTEGER) {
-                    this.integer(option.name, option.description) { option as IntegerOption
-                        this.required = option.required
-                        this.minValue = option.minValue
-                        this.maxValue = option.maxValue
-                        option.choices.forEach {
-                            this.choice(it.name, it.value)
-                        }
-                    }
-                }
-
-                //Boolean
-                if(option.type == OptionType.BOOLEAN) {
-                    this.boolean(option.name, option.description) { option as BooleanOption
-                        this.required = option.required
-                    }
-                }
-
-                //SubCommand
-                if(option.type == OptionType.SUB_COMMAND) {
-                    this.subCommand(option.name, option.description) { option as SubCommandOption
-                        this.required = option.required
-                        option.options?.forEach { option2 ->
-                            this.setOptions(option2)
-                        }
-                    }
-                }
-
-                //Group
-                if(option.type == OptionType.GROUP) {
-                    this.group(option.name, option.description) { option as GroupOption
-                        this.required = option.required
-                        option.subCommands?.forEach { subCommandOption ->
-                            this.subCommand(subCommandOption.name, subCommandOption.description) {
-                                this.required = subCommandOption.required
-                                subCommandOption.options?.forEach { option2 ->
-                                    this.setOptions(option2)
-                                }
+            //Group
+            if(option.type == OptionType.GROUP) {
+                this.group(option.name, option.description) { option as GroupOption
+                    this.required = option.required
+                    option.subCommands?.forEach { subCommandOption ->
+                        this.subCommand(subCommandOption.name, subCommandOption.description) {
+                            this.required = subCommandOption.required
+                            subCommandOption.options?.forEach { option2 ->
+                                this.setOptions(option2)
                             }
                         }
                     }
