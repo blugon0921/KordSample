@@ -2,3 +2,4 @@
 /.gradle/
 /build/
 /.idea/
+/src/main/kotlin/kr/blugon/kordsample/Settings.kt
