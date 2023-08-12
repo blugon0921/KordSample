@@ -1,9 +1,10 @@
-package kr.blugon.kordsample
+package kr.blugon.kordsample.api
 
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.rest.builder.interaction.*
-import kr.blugon.kordsample.api.*
+import kr.blugon.kordsample.Loadable
+import kr.blugon.kordsample.Settings
 
 interface Command: Loadable {
     val command: String

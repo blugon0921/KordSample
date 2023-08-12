@@ -5,6 +5,7 @@ import dev.kord.core.Kord
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import kr.blugon.kordsample.Main.bot
+import kr.blugon.kordsample.api.Command
 import java.io.File
 
 object Main {

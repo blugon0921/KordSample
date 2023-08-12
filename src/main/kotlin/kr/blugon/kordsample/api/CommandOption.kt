@@ -1,11 +1,10 @@
 package kr.blugon.kordsample.api
 
+import dev.kord.common.Locale
 import dev.kord.common.entity.ChannelType
 import dev.kord.common.entity.Choice
-import dev.kord.rest.builder.interaction.BooleanBuilder
-import dev.kord.rest.builder.interaction.IntegerOptionBuilder
-import dev.kord.rest.builder.interaction.NumberOptionBuilder
-import dev.kord.rest.builder.interaction.StringChoiceBuilder
+import dev.kord.common.entity.optional.Optional
+import dev.kord.rest.builder.interaction.*
 
 interface CommandOption {
     val name: String
@@ -75,7 +74,11 @@ data class StringOption( //String
 ): CommandOption {
     override val type: OptionType = OptionType.STRING
     override var required = false
-    val choices = ArrayList<Choice<String>>()
+    val choices = ArrayList<Choice.StringChoice>()
+
+    fun choice(name: String, value: String) {
+        choices.add(Choice.StringChoice(name, Optional.Missing(), value))
+    }
 }
 
 data class IntegerOption( //Integer
@@ -86,7 +89,11 @@ data class IntegerOption( //Integer
 ): CommandOption {
     override val type: OptionType = OptionType.INTEGER
     override var required = false
-    val choices = ArrayList<Choice<Long>>()
+    val choices = ArrayList<Choice.IntegerChoice>()
+
+    fun choice(name: String, value: Long) {
+        choices.add(Choice.IntegerChoice(name, Optional.Missing(), value))
+    }
 }
 
 data class BooleanOption( //Boolean

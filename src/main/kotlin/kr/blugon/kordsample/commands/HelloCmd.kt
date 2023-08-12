@@ -6,7 +6,7 @@ import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEve
 import dev.kord.core.kordLogger
 import dev.kord.core.on
 import dev.kord.rest.builder.message.create.embed
-import kr.blugon.kordsample.Command
+import kr.blugon.kordsample.api.Command
 import kr.blugon.kordsample.Main.bot
 import kr.blugon.kordsample.Modules.log
 import kr.blugon.kordsample.api.LogColor
