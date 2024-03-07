@@ -1,18 +1,18 @@
 package kr.blugon.kordsample
 
+import com.kotlindiscord.kord.extensions.ExtensibleBot
+import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.common.entity.PresenceStatus
-import dev.kord.core.Kord
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import kr.blugon.kordsample.Main.bot
-import kr.blugon.kordsample.api.Command
 import java.io.File
 
 object Main {
-    lateinit var bot: Kord
+    lateinit var bot: ExtensibleBot
 
-    val kordIsReady = HashMap<Kord, Boolean>()
-    var Kord.isReady: Boolean
+    val kordIsReady = HashMap<ExtensibleBot, Boolean>()
+    var ExtensibleBot.isReady: Boolean
         get() {
             if(kordIsReady[this] == null) kordIsReady[this] = false
             return kordIsReady[this]!!
@@ -23,35 +23,39 @@ object Main {
 }
 
 suspend fun main(args: Array<String>) {
-    bot = Kord(Settings.TEST_TOKEN)
-//    bot = Kord(Settings.TOKEN)
 
     val rootPackage = Main.javaClass.`package`
-
-    //Commands
-    rootPackage.classesRunnable("commands").forEach { runnable ->
-        runnable.run()
-    }
-
-    //Events
-    rootPackage.classesRunnable("events").forEach { runnable ->
-        runnable.run()
-    }
-
-    bot.login {
-        intents += Intent.Guilds
-        intents += Intent.GuildVoiceStates
-        @OptIn(PrivilegedIntent::class)
-        intents += Intent.GuildMembers
-        intents += Intent.GuildMessages
-        @OptIn(PrivilegedIntent::class)
-        intents += Intent.MessageContent
-
+    val TOKEN = if (args[0] == "test") Settings.TEST_TOKEN
+                else Settings.TOKEN
+    bot = ExtensibleBot(TOKEN) {
         presence {
-            status = PresenceStatus.Offline
-            playing("command | version")
+            status = PresenceStatus.Online
+            playing("kordSample | asdf")
+        }
+
+        @OptIn(PrivilegedIntent::class)
+        intents {
+            +Intent.Guilds
+            +Intent.GuildVoiceStates
+            +Intent.GuildMembers
+            +Intent.GuildMessages
+            +Intent.MessageContent
+        }
+
+        extensions {
+            //Commands
+            rootPackage.classesRunnable("commands").forEach { extension ->
+                add { extension as Extension }
+            }
+
+            //Events
+            rootPackage.classesRunnable("events").forEach { runnable ->
+                (runnable as Runnable).run()
+            }
         }
     }
+
+    bot.start()
 }
 
 
@@ -82,12 +86,12 @@ fun Package.classes(more: String = ""): ArrayList<Class<*>> {
     return classes
 }
 
-fun Package.classesRunnable(more: String = ""): ArrayList<Runnable> {
-    val runnables = ArrayList<Runnable>()
+fun Package.classesRunnable(more: String = ""): ArrayList<Any> {
+    val runnables = ArrayList<Any>()
     this.classes(more).forEach { clazz ->
         try {
             val instance = clazz.getDeclaredConstructor().newInstance()
-            runnables.add(instance as Runnable)
+            runnables.add(instance)
         } catch (e: Exception) {
             return@forEach
         }

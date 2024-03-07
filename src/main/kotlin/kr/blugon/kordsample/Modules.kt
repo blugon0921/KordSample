@@ -3,7 +3,7 @@ package kr.blugon.kordsample
 import dev.kord.core.entity.interaction.GuildComponentInteraction
 import dev.kord.rest.builder.message.EmbedBuilder
 import kr.blugon.kordsample.api.LogColor
-import kr.blugon.kordsample.api.LogColor.color
+import kr.blugon.kordsample.api.LogColor.Companion.color
 import mu.KLogger
 import java.text.SimpleDateFormat
 import java.util.*

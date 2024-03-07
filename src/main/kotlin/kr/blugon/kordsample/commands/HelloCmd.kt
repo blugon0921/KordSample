@@ -1,39 +1,36 @@
 package kr.blugon.kordsample.commands
 
-import dev.kord.core.Kord
-import dev.kord.core.behavior.interaction.respondPublic
-import dev.kord.core.event.interaction.GuildChatInputCommandInteractionCreateEvent
-import dev.kord.core.kordLogger
-import dev.kord.core.on
-import dev.kord.rest.builder.message.create.embed
-import kr.blugon.kordsample.api.Command
-import kr.blugon.kordsample.Main.bot
-import kr.blugon.kordsample.Modules.log
-import kr.blugon.kordsample.api.LogColor
-import kr.blugon.kordsample.api.LogColor.inColor
-import kr.blugon.kordsample.api.StringOption
+import com.kotlindiscord.kord.extensions.commands.Arguments
+import com.kotlindiscord.kord.extensions.commands.converters.impl.string
+import com.kotlindiscord.kord.extensions.extensions.Extension
+import com.kotlindiscord.kord.extensions.extensions.publicSlashCommand
+import dev.kord.rest.builder.message.embed
 import kr.blugon.kordsample.Settings
 
-class HelloCmd: Command, Runnable {
-    override val command = "hello"
-    override val description = "Hello, world!"
-    override val options = listOf(
-        StringOption("location", "이동할 위치를 적어주세요(00:00:00)").apply {
-            this.required = true
-        }
-    )
+class HelloCmd: Extension() {
+    override val name = "hello"
 
-     override fun run() {
-        kordLogger.log("${LogColor.CYAN.inColor("✔")} ${LogColor.CYAN.inColor(command)} 커맨드 불러오기 성공")
-        bot.on<GuildChatInputCommandInteractionCreateEvent> {
-            if(interaction.command.rootName != command) return@on
+    override suspend fun setup() {
+        publicSlashCommand(::HelloArg) {
+            name = "hello"
+            description = "Hello, world!"
 
-            interaction.respondPublic {
-                embed {
-                    title = "Hello, world!"
-                    color = Settings.COLOR_NORMAL
+            action {
+                respond {
+                    embed {
+                        title = "Hello, ${arguments.hello}!"
+                        color = Settings.COLOR_NORMAL
+                    }
                 }
             }
+        }
+    }
+
+    inner class HelloArg: Arguments() {
+        val hello by string {
+            name = "hello"
+            description = "HELLO"
+            require(true)
         }
     }
 }
