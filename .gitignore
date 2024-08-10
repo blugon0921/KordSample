@@ -1,5 +1,3 @@
-# 프로젝트 제외 경로
-/.gradle/
-/build/
-/.idea/
-/src/main/kotlin/kr/blugon/kordsample/Settings.kt
+.gradle/
+build/
+.idea/

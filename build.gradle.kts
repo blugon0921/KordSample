@@ -1,6 +1,8 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
-    kotlin("jvm") version "1.9.23"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    kotlin("jvm") version "2.0.0"
+    id("com.gradleup.shadow") version "8.3.0"
 }
 
 java {
@@ -17,22 +19,26 @@ repositories {
     mavenCentral()
     maven("https://jitpack.io")
     maven("https://oss.sonatype.org/content/repositories/snapshots")
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
+    maven("https://repo.blugon.kr/repository/maven-public/")
 }
 
 dependencies {
     compileOnly(kotlin("stdlib"))
     compileOnly(kotlin("reflect"))
     implementation("dev.kord:kord-core:latest.release")
+    implementation("kr.blugon:kordmand:latest.release")
     implementation("org.slf4j:slf4j-simple:latest.release")
-    implementation("com.kotlindiscord.kord.extensions:kord-extensions:latest.release")
+    implementation("org.json:json:20240205")
+    implementation("io.github.classgraph:classgraph:latest.release")
 }
 
 
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_21.toString()
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
 
     jar { this.build() }

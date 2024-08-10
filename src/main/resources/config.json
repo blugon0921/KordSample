@@ -1,0 +1,11 @@
+{
+  "token": "String",
+  "guildId": "Int",
+
+  "testToken": "String",
+  "testGuildId": "Int",
+
+  "colorNormal": "FFFFFF",
+  "colorLoading": "FFD000",
+  "colorError": "C12E2E"
+}

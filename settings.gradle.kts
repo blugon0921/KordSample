@@ -1,1 +1,1 @@
-rootProject.name = "KordSample"
+rootProject.name = "KordTemplate"
