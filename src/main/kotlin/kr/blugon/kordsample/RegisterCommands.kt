@@ -10,11 +10,11 @@ import kr.blugon.kordsample.api.logger
 
 suspend fun registerCommands(isTest: Boolean = false) {
     val token = when(isTest) {
-        true -> Settings.TEST_TOKEN!!
+        true -> Settings.TEST_TOKEN?: ThrowConfigException("testToken")
         false -> Settings.TOKEN
     }
     val guildId = when(isTest) {
-        true -> Settings.TEST_GUILD_ID!!
+        true -> Settings.TEST_GUILD_ID?: ThrowConfigException("testGuildId")
         false -> Settings.GUILD_ID
     }
     val bot = Kord(token)

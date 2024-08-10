@@ -2,43 +2,37 @@ package kr.blugon.kordsample
 
 import dev.kord.common.entity.PresenceStatus
 import dev.kord.core.Kord
-import dev.kord.gateway.Intent
-import dev.kord.gateway.PrivilegedIntent
+import dev.kord.core.exception.KordInitializationException
 import io.github.classgraph.ClassGraph
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kr.blugon.kordmand.Command
-import kr.blugon.kordsample.api.Event
-import kr.blugon.kordsample.api.LogColor
-import kr.blugon.kordsample.api.Registable
-import kr.blugon.kordsample.api.logger
-import kr.blugon.kordsample.exception.ConfigException
+import kr.blugon.kordsample.api.*
 import java.io.File
 import java.io.FileNotFoundException
-import kotlin.system.exitProcess
 
 
 object Main
 lateinit var bot: Kord
 
-private val kordIsReady = HashMap<Kord, Boolean>()
+private val _isReady = HashMap<Kord, Boolean>()
 var Kord.isReady: Boolean
     get() {
-        if(kordIsReady[this] == null) kordIsReady[this] = false
-        return kordIsReady[this]!!
+        if(_isReady[this] == null) _isReady[this] = false
+        return _isReady[this]!!
     }
     set(value) {
-        kordIsReady[this] = value
+        _isReady[this] = value
     }
 
-private val kordIsTestBot = HashMap<Kord, Boolean>()
+private val _isTest = HashMap<Kord, Boolean>()
 var Kord.isTest: Boolean
     get() {
-        if(kordIsTestBot[this] == null) kordIsTestBot[this] = false
-        return kordIsTestBot[this]!!
+        if(_isTest[this] == null) _isTest[this] = false
+        return _isTest[this]!!
     }
     set(value) {
-        kordIsTestBot[this] = value
+        _isTest[this] = value
     }
 
 suspend fun main(args: Array<String>) {
@@ -49,26 +43,20 @@ suspend fun main(args: Array<String>) {
             settingsFile.createNewFile()
             settingsFile.writeText(resource)
         }
-        println("Please edit config.json")
-        return
+        return println("Please edit config.json")
     }
-    val isTest = args.getOrNull(0) == "test"
+    val isTest = args.contains("-test")
 
-    if(isTest) {
-        if(Settings.TEST_TOKEN == null) ThrowConfigException("testToken")
-        if(Settings.TEST_GUILD_ID == null) ThrowConfigException("testGuildId")
-    }
-    if(args.contains("-registerCommands")) {
-        registerCommands(isTest)
-        return
-    }
+    if(args.contains("-registerCommands")) return registerCommands(isTest)
 
     val rootPackage = Main.javaClass.`package`
 
-    bot = Kord(when(isTest) {
-        true -> Settings.TEST_TOKEN!!
-        false -> Settings.TOKEN
-    })
+    bot = try {
+        Kord(
+            if (isTest) Settings.TEST_TOKEN?: ThrowConfigException("testToken")
+            else Settings.TOKEN
+        )
+    } catch (_: KordInitializationException) { return println("The token is invalid".color(LogColor.RED)) }
     bot.isTest = isTest
 
     //Commands
